@@ -13,7 +13,7 @@ form.addEventListener("submit", async function (e) {
   }
 
   try {
-    const response = await fetch("https://1a16df46-e76c-468c-91ef-462437a87944.e1-us-east-azure.choreoapps.dev/generate", {
+    const response = await fetch("https://ffc0f199-8cc5-478a-9d1e-90cfe6b06585.e1-us-east-azure.choreoapps.dev/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
