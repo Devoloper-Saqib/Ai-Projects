@@ -1,55 +1,62 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const fetch = require("node-fetch");
+const bodyParser = require("body-parser");
+const axios = require("axios");
 
 dotenv.config();
-
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
-app.use(cors());
-app.use(express.json());
+// ✅ Enable CORS for Netlify frontend
+app.use(cors({
+  origin: "https://webbot-ai-website-builder.netlify.app",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"],
+}));
 
-app.get("/", (req, res) => {
-  res.send("✅ Backend is running (OpenRouter)");
-});
+app.use(bodyParser.json());
 
 app.post("/generate", async (req, res) => {
   const { prompt } = req.body;
 
   if (!prompt) {
-    return res.status(400).json({ error: "Prompt is required" });
+    return res.status(400).json({ error: "No prompt provided" });
   }
 
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://webbot-ai-website-builder.netlify.app", // your frontend URL
-        "X-Title": "WebBot AI Site Generator"
-      },
-      body: JSON.stringify({
-        model: "openchat/openchat-7b", // or any model available
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "openchat/openchat-7b:free",
         messages: [
-          { role: "system", content: "You are a helpful assistant that only returns HTML code." },
-          { role: "user", content: prompt }
-        ]
-      })
-    });
+          {
+            role: "user",
+            content: `Write complete HTML code for this website idea: ${prompt}`,
+          },
+        ],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "No response";
-    res.json({ content });
+    const html = response.data.choices?.[0]?.message?.content;
+    if (!html) {
+      return res.status(500).json({ error: "No HTML generated" });
+    }
 
-  } catch (err) {
-    console.error("Fetch error:", err);
-    res.status(500).json({ error: "Failed to generate response" });
+    res.json({ html });
+  } catch (error) {
+    console.error("Error calling OpenRouter API:", error.message);
+    res.status(500).json({ error: "Failed to generate HTML" });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`🚀 Server running on port ${port}`);
 });
+
