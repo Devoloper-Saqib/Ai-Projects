@@ -1,61 +1,53 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const path = require("path");
-const fetch = (...args) =>
-  import("node-fetch").then(({ default: fetch }) => fetch(...args));
+const axios = require("axios");
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000; // ✅ Zeabur fix
+const port = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
-app.use("/frontend", express.static(path.join(__dirname, "../frontend")));
+// CORS FIX 👇
+app.use(cors({
+  origin: "https://webbot-ai-website-builder.netlify.app"
+}));
+
+app.use(bodyParser.json());
 
 app.post("/generate", async (req, res) => {
+  const { prompt } = req.body;
+
   try {
-    const userPrompt = req.body.prompt;
-    if (!userPrompt) return res.status(400).json({ error: "Prompt is missing" });
-
-    const finalPrompt = `
-Generate a single valid HTML5 file with all CSS in <style> and all JS in <script>.
-Include <!DOCTYPE html>, <html>, <head>, <body>.
-Don't include Markdown, comments, or explanations.
-Only output final HTML.
-
-Prompt: "${userPrompt}"
-`;
-
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
+    const response = await axios.post("https://openrouter.ai/api/v1/chat/completions", {
+      model: "openai/gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "You are a web developer who generates complete HTML websites in response to text prompts. Your responses should include full HTML, CSS, and JavaScript code inside a single HTML file."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
+    }, {
       headers: {
         Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "HTTP-Referer": "http://localhost:3000",
-        "X-Title": "AI Website Generator",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "deepseek/deepseek-r1-0528:free",
-        messages: [{ role: "user", content: finalPrompt }],
-      }),
+        "Content-Type": "application/json"
+      }
     });
 
-    const data = await response.json();
-    const aiMessage = data?.choices?.[0]?.message?.content;
+    const html = response.data.choices[0].message.content;
+    res.json({ html });
 
-    if (!aiMessage || !aiMessage.includes("<html")) {
-      return res.status(500).json({ error: "AI did not return full HTML content." });
-    }
-
-    res.json({ content: aiMessage });
-  } catch (err) {
-    console.error("❌ Server error:", err.message);
-    res.status(500).json({ error: "Server error" });
+  } catch (error) {
+    console.error("Error generating website:", error);
+    res.status(500).json({ error: "Failed to generate website." });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`🚀 Server running on port ${port}`);
 });

@@ -15,11 +15,14 @@ window.addEventListener("DOMContentLoaded", async () => {
   promptText.textContent = "Prompt: " + prompt;
 
   try {
-    const res = await fetch("http://127.0.0.1:3000/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
+    const res = await fetch("https://ai-projects-production.up.railway.app/generate", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ prompt })
+});
+
 
     const data = await res.json();
     const content = data?.content || "";

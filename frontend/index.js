@@ -2,7 +2,7 @@ const form = document.querySelector("form");
 const input = document.querySelector("#input");
 
 form.addEventListener("submit", async function (e) {
-  e.preventDefault(); // prevent form navigation
+  e.preventDefault();
 
   const prompt = input.value.trim();
   if (!prompt) {
@@ -13,7 +13,7 @@ form.addEventListener("submit", async function (e) {
   }
 
   try {
-    const response = await fetch("https://ffc0f199-8cc5-478a-9d1e-90cfe6b06585.e1-us-east-azure.choreoapps.dev/generate", {
+    const response = await fetch("https://ai-projects-production.up.railway.app/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
