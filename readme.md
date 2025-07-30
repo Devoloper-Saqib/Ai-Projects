@@ -56,3 +56,26 @@ npm install
 # Start the server
 node server.js
 Now visit 👉 http://localhost:3000 in your browser.
+
+🌐 Deployment
+You can deploy this project using free hosting platforms like:
+
+Render
+
+Railway
+
+Glitch
+
+Make sure to:
+
+Add a .env file for storing API keys securely
+
+Update server.js to read API key using process.env
+
+🙌 Author
+Saqib Asif
+🔗 GitHub
+
+📄 License
+This project is licensed under the MIT License — feel free to use and modify.
+
