@@ -1,54 +1,46 @@
 const form = document.querySelector("form");
 const input = document.querySelector("#input");
 
-form.addEventListener("submit", function (e) {
-  e.preventDefault();
+form.addEventListener("submit", async function (e) {
+  e.preventDefault(); // prevent form navigation
 
   const prompt = input.value.trim();
-
   if (!prompt) {
     input.classList.add("shake", "error-outline");
-    input.placeholder = 'Please type something';
-
-    setTimeout(() => {
-      input.classList.remove("shake");
-    }, 400);
+    input.placeholder = "Please type something!";
+    setTimeout(() => input.classList.remove("shake"), 400);
     return;
   }
 
-  // ✅ Parse function inside condition
-  async function parse() {
-    try {
-      const response = await fetch("https://1a16df46-e76c-468c-91ef-462437a87944.e1-us-east-azure.choreoapps.dev/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ prompt })
-      });
+  try {
+    const response = await fetch("https://1a16df46-e76c-468c-91ef-462437a87944.e1-us-east-azure.choreoapps.dev/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    });
 
-      const data = await response.json();
-      console.log("Generated:", data);
+    const data = await response.json();
 
-      // ✅ Store in localStorage (optional)
-      localStorage.setItem("generatedHTML", data.html || "No HTML received");
-      
-      // ✅ Redirect to result page
-      window.location.href = "result.html";
-
-    } catch (error) {
-      console.error("Error generating website:", error);
+    if (data && data.html) {
+      // Open new tab and show generated code
+      const newTab = window.open("result.html", "_blank");
+      newTab.onload = () => {
+        newTab.document.body.innerHTML = `<pre><code>${escapeHtml(data.html)}</code></pre>`;
+      };
+    } else {
+      alert("Error: No HTML received from server.");
     }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Something went wrong. Check console for details.");
   }
-
-  parse();
 });
 
-// ✨ Enhance button logic
+// Enhance prompt button
 document.getElementById('enhance').addEventListener('click', () => {
-  const input = document.getElementById('input');
   let prompt = input.value.trim().toLowerCase();
-
   if (!prompt) return;
 
   const toRemove = [
@@ -60,7 +52,6 @@ document.getElementById('enhance').addEventListener('click', () => {
     /^i want (a|an)?\s*/g,
     /^i need (a|an)?\s*/g
   ];
-
   toRemove.forEach(pattern => {
     prompt = prompt.replace(pattern, '');
   });
@@ -78,3 +69,15 @@ document.getElementById('enhance').addEventListener('click', () => {
 
   input.value = enhanced;
 });
+
+function escapeHtml(unsafe) {
+  return unsafe.replace(/[&<>"']/g, function (m) {
+    return ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;',
+    })[m];
+  });
+}
