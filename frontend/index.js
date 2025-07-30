@@ -1,42 +1,33 @@
- const form = document.querySelector("form");
-    const input = document.querySelector("#input");
+const form = document.querySelector("form");
+const input = document.querySelector("#input");
+const promptInput = document.getElementById("prompt-input");
 
+// Live Choreo backend endpoint
+const BACKEND_URL = "https://1a16df46-e76c-468c-91ef-462437a87944.e1-us-east-azure.choreoapps.dev/api/generate";
 
-    form.addEventListener("submit", function (e) {
-      if (input.value.trim() === "") {
-        e.preventDefault();
-        input.classList.add("shake", "error-outline");
-        document.getElementsByName('prompt')[0].placeholder = 'Please Type Something';
+// Form submit handler
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
 
-        setTimeout(() => {
-          input.classList.remove("shake");
-        }, 400);
-      }
-      else {
-        async function parse() {
-      
-        const prompt = document.getElementById("prompt-input").value;
+  if (input.value.trim() === "") {
+    input.classList.add("shake", "error-outline");
+    input.placeholder = 'Please type something';
+    
+    setTimeout(() => {
+      input.classList.remove("shake");
+    }, 400);
+  } else {
+    parse();
+  }
+});
 
-        const response = await fetch("http://localhost:3000/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ prompt: prompt })
-        });
-
-        const data = await response.json();
-        console.log("Generated:", data);
-      }
-      }
-    });
-    document.getElementById('enhance').addEventListener('click', () => {
+// Enhance button click
+document.getElementById('enhance').addEventListener('click', () => {
   const input = document.getElementById('input');
   let prompt = input.value.trim().toLowerCase();
 
   if (!prompt) return;
 
-  // Remove filler phrases
   const toRemove = [
     /^make me (a|an)?\s*/g,
     /^build (me)?( a| an)?\s*/g,
@@ -51,7 +42,6 @@
     prompt = prompt.replace(pattern, '');
   });
 
-  // Optionally enhance known types
   let enhanced = '';
   if (prompt.includes("blog")) {
     enhanced = "A modern blog website with categories, search bar, and newsletter subscription.";
@@ -65,3 +55,33 @@
 
   input.value = enhanced;
 });
+
+// Function to send request to backend
+async function parse() {
+  const prompt = promptInput.value;
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    if (!response.ok) {
+      throw new Error("Backend error");
+    }
+
+    const data = await response.json();
+    console.log("Generated HTML:", data);
+
+    // You can now insert data.html into an iframe or redirect
+    // Example:
+    localStorage.setItem("generatedHTML", data.html);
+    window.location.href = "result.html";
+
+  } catch (error) {
+    console.error("Fetch failed:", error);
+  }
+}
