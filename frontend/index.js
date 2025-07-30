@@ -1,48 +1,45 @@
 const form = document.querySelector("form");
-const input = document.querySelector("#input");
+const input = document.getElementById("input");
 
 form.addEventListener("submit", function (e) {
   if (input.value.trim() === "") {
     e.preventDefault();
     input.classList.add("shake", "error-outline");
-    document.getElementsByName('prompt')[0].placeholder = 'Please Type Something';
+    input.placeholder = "Please Type Something";
 
     setTimeout(() => {
       input.classList.remove("shake");
     }, 400);
   } else {
-    e.preventDefault(); // prevent page reload
-
-    async function parse() {
-      const prompt = document.getElementById("prompt-input").value;
-
-      const response = await fetch("https://1a16df46-e76c-468c-91ef-462437a87944.e1-us-east-azure.choreoapps.dev/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ prompt: prompt })
-      });
-
-      const data = await response.json();
-      console.log("Generated:", data);
-
-      // Store result for next page
-      localStorage.setItem("generatedHTML", data.html);
-      window.location.href = "result.html";
-    }
-
-    parse(); // ⬅️ call the function here
+    e.preventDefault(); // prevent default form behavior
+    parse(); // call the async function
   }
 });
 
+async function parse() {
+  const prompt = input.value;
+
+  const response = await fetch("https://1a16df46-e76c-468c-91ef-462437a87944.e1-us-east-azure.choreoapps.dev/api/generate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ prompt })
+  });
+
+  const data = await response.json();
+  console.log("Generated:", data);
+
+  // Save the result in localStorage and redirect
+  localStorage.setItem("generatedHTML", data.html);
+  window.location.href = "result.html";
+}
+
 document.getElementById('enhance').addEventListener('click', () => {
-  const input = document.getElementById('input');
   let prompt = input.value.trim().toLowerCase();
 
   if (!prompt) return;
 
-  // Remove filler phrases
   const toRemove = [
     /^make me (a|an)?\s*/g,
     /^build (me)?( a| an)?\s*/g,
@@ -57,7 +54,6 @@ document.getElementById('enhance').addEventListener('click', () => {
     prompt = prompt.replace(pattern, '');
   });
 
-  // Optionally enhance known types
   let enhanced = '';
   if (prompt.includes("blog")) {
     enhanced = "A modern blog website with categories, search bar, and newsletter subscription.";
