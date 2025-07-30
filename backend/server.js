@@ -8,9 +8,13 @@ const fetch = (...args) =>
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000; // ✅ Zeabur fix
+const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// ✅ Fix: Allow CORS only from Netlify frontend
+app.use(cors({
+  origin: 'https://webbot-ai-website-builder.netlify.app',
+}));
+
 app.use(express.json());
 app.use("/frontend", express.static(path.join(__dirname, "../frontend")));
 
