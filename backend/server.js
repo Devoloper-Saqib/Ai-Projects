@@ -10,6 +10,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+
+app.get("/", (req, res) => {
+  res.send("✅ Backend is running");
+});
+
 // ✅ Fix: Allow CORS only from Netlify frontend
 app.use(cors({
   origin: 'https://webbot-ai-website-builder.netlify.app',
