@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Website Preview</title>
+
+  <link rel="stylesheet" href="result.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>AI Website Result</h1>
+      <p id="promptText">Prompt: Loading...</p>
+    </div>
+
+    <div class="content">
+      <div class="source-box">
+        <h2>📜 Source Code</h2>
+        <pre><code id="sourceCode" class="html"></code></pre>
+      </div>
+
+      <div class="preview-box">
+        <h2>🖥 Preview</h2>
+        <iframe id="preview" style="display: none;" sandbox="allow-scripts allow-same-origin"></iframe>
+        <button id="fullscreenBtn" class="hidden">🔍 Fullscreen</button>
+        <p id="loading">Generating with AI...</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="code-actions">
+    <button id="copyBtn">📋 Copy Code</button>
+    <button id="downloadBtn">⬇️ Download HTML</button>
+  </div>
+
+  <pre><code id="codeBlock" class="html" style="display: none;"></code></pre>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
