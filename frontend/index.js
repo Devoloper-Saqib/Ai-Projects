@@ -24,11 +24,10 @@ form.addEventListener("submit", async function (e) {
     const data = await response.json();
 
     if (data && data.html) {
-      // Open new tab and show generated code
-      const newTab = window.open("result.html", "_blank");
-      newTab.onload = () => {
-        newTab.document.body.innerHTML = `<pre><code>${escapeHtml(data.html)}</code></pre>`;
-      };
+      const newTab = window.open();
+      newTab.document.open();
+      newTab.document.write(data.html);
+      newTab.document.close();
     } else {
       alert("Error: No HTML received from server.");
     }
@@ -38,7 +37,6 @@ form.addEventListener("submit", async function (e) {
   }
 });
 
-// Enhance prompt button
 document.getElementById('enhance').addEventListener('click', () => {
   let prompt = input.value.trim().toLowerCase();
   if (!prompt) return;
@@ -69,15 +67,3 @@ document.getElementById('enhance').addEventListener('click', () => {
 
   input.value = enhanced;
 });
-
-function escapeHtml(unsafe) {
-  return unsafe.replace(/[&<>"']/g, function (m) {
-    return ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;',
-    })[m];
-  });
-}
