@@ -1,41 +1,52 @@
 const form = document.querySelector("form");
-const input = document.getElementById("input");
+const input = document.querySelector("#input");
 
 form.addEventListener("submit", function (e) {
-  if (input.value.trim() === "") {
-    e.preventDefault();
+  e.preventDefault();
+
+  const prompt = input.value.trim();
+
+  if (!prompt) {
     input.classList.add("shake", "error-outline");
-    input.placeholder = "Please Type Something";
+    input.placeholder = 'Please type something';
 
     setTimeout(() => {
       input.classList.remove("shake");
     }, 400);
-  } else {
-    e.preventDefault(); // prevent default form behavior
-    parse(); // call the async function
+    return;
   }
+
+  // ✅ Parse function inside condition
+  async function parse() {
+    try {
+      const response = await fetch("https://1a16df46-e76c-468c-91ef-462437a87944.e1-us-east-azure.choreoapps.dev/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ prompt })
+      });
+
+      const data = await response.json();
+      console.log("Generated:", data);
+
+      // ✅ Store in localStorage (optional)
+      localStorage.setItem("generatedHTML", data.html || "No HTML received");
+      
+      // ✅ Redirect to result page
+      window.location.href = "result.html";
+
+    } catch (error) {
+      console.error("Error generating website:", error);
+    }
+  }
+
+  parse();
 });
 
-async function parse() {
-  const prompt = input.value;
-
-  const response = await fetch("https://1a16df46-e76c-468c-91ef-462437a87944.e1-us-east-azure.choreoapps.dev/api/generate", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ prompt })
-  });
-
-  const data = await response.json();
-  console.log("Generated:", data);
-
-  // Save the result in localStorage and redirect
-  localStorage.setItem("generatedHTML", data.html);
-  window.location.href = "result.html";
-}
-
+// ✨ Enhance button logic
 document.getElementById('enhance').addEventListener('click', () => {
+  const input = document.getElementById('input');
   let prompt = input.value.trim().toLowerCase();
 
   if (!prompt) return;
