@@ -17,8 +17,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   try {
     const res = await fetch("https://ai-projects-production.up.railway.app/generate", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ prompt }),
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ prompt })
 });
 
 
