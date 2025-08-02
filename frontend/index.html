@@ -9,16 +9,23 @@
 </head>
 <body>
   <h1>Let AI Build Your Custom Website</h1>
-  <!-- ✅ Removed action + method from form -->
   <form>
     <div class="glass-container">
-      <!-- ✅ This ID is used in JS -->
       <textarea placeholder="Type your website idea here..." id="input" name="prompt"></textarea>
       <button type="button" id="enhance">Enhance Prompt ✨</button>
       <button type="submit" id="generateForm">Generate</button>
     </div>
   </form>
 
+  <script>
+    document.getElementById("generateForm").addEventListener("click", function (e) {
+      e.preventDefault();
+      const prompt = document.getElementById("input").value.trim();
+      if (!prompt) return alert("Please enter a prompt.");
+      // Redirect with encoded prompt
+      window.location.href = `result.html?prompt=${encodeURIComponent(prompt)}`;
+    });
+  </script>
   <!-- ✅ Script placed at bottom for DOM readiness -->
   <script src="index.js"></script>
 </body>
