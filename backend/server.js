@@ -5,6 +5,9 @@ const axios = require("axios");
 const app = express();
 const port = process.env.PORT || 3000;
 
+// ✅ Clean API Key
+const apiKey = "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".trim();
+
 app.use(cors());
 app.use(express.json());
 
@@ -37,8 +40,10 @@ app.post("/generate", async (req, res) => {
       },
       {
         headers: {
-          Authorization: "Bearer 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",
+          Authorization: `Bearer ${apiKey}`, // ✅ Clean usage
           "Content-Type": "application/json",
+          "HTTP-Referer": "https://webbot-ai-website-builder.netlify.app",
+          "X-Title": "Webbot AI Site Builder"
         },
       }
     );
