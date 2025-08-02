@@ -9,34 +9,37 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.post("/generate", async (req, res) => {
-  const prompt = req.body.prompt;
+  const userPrompt = req.body.prompt;
 
   try {
     const response = await axios.post(
-      "https://api-inference.huggingface.co/models/Writer/codellama-34b-Instruct-hf",
+      "https://openrouter.ai/api/v1/chat/completions",
       {
-        inputs: prompt,
+        model: "deepseek/deepseek-r1-0528:free",
+        messages: [
+          {
+            role: "user",
+            content: userPrompt,
+          },
+        ],
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://webbot-ai-website-builder.netlify.app", // optional
+          "X-Title": "WebBot AI Builder", // optional
         },
       }
     );
 
-    const generatedText = response.data?.[0]?.generated_text;
-    if (!generatedText) {
-      return res.status(500).json({ error: "No HTML content received from API" });
-    }
-
-    res.json({ html: generatedText });
-  } catch (error) {
-    console.error("API Error:", error.message);
-    res.status(500).json({ error: "Failed to generate HTML" });
+    const htmlContent = response.data.choices[0].message.content;
+    res.json({ html: htmlContent });
+  } catch (err) {
+    console.error("Error fetching from OpenRouter:", err.message);
+    res.status(500).json({ error: "Failed to generate content." });
   }
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
