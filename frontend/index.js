@@ -13,7 +13,7 @@ form.addEventListener("submit", async function (e) {
   }
 
   try {
-    const response = await fetch("https://ai-projects-production.up.railway.app/generate", {
+    const response = await fetch("https://ai-projects-neon.vercel.app/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
