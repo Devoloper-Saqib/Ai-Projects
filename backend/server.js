@@ -7,9 +7,8 @@ const axios = require("axios");
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
 
-// CORS FIX 👇
+// ✅ CORS for your frontend
 app.use(cors({
   origin: "https://webbot-ai-website-builder.netlify.app"
 }));
@@ -48,6 +47,5 @@ app.post("/generate", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
-});
+// ✅ No app.listen for Vercel
+module.exports = app;
