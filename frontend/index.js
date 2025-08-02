@@ -1,36 +1,29 @@
-document.getElementById("generateForm").addEventListener("submit", async function (e) {
+document.getElementById("generateForm").addEventListener("click", async (e) => {
   e.preventDefault();
-  const userInput = document.getElementById("prompt").value;
-  const resultDiv = document.getElementById("result");
+  const input = document.getElementById("input").value.trim();
+  if (!input) return alert("❗ Please enter a prompt.");
 
-  resultDiv.innerHTML = "Generating... Please wait.";
+  // Optional: Enhance step if needed before generating (currently skipped)
+  const encodedPrompt = encodeURIComponent(input);
+  window.location.href = `result.html?prompt=${encodedPrompt}`;
+});
+
+document.getElementById("enhance").addEventListener("click", async () => {
+  const input = document.getElementById("input").value.trim();
+  if (!input) return alert("❗ Please enter a prompt to enhance.");
 
   try {
-    const response = await fetch("https://ai-projects-neon.vercel.app/generate", {
+    const res = await fetch("https://ai-projects-mujulgdrd-devoloper-saqibs-projects.vercel.app/enhance", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ prompt: userInput }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: input })
     });
 
-    const data = await response.json();
-
-    if (!data.html) {
-      resultDiv.innerHTML = "No content received.";
-      return;
-    }
-
-    // display the response
-    resultDiv.innerText = data.html;
-
-    // Also render HTML preview
-    const previewFrame = document.getElementById("previewFrame");
-    const previewDocument = previewFrame.contentDocument || previewFrame.contentWindow.document;
-    previewDocument.open();
-    previewDocument.write(data.html);
-    previewDocument.close();
+    const data = await res.json();
+    const enhanced = data?.enhancedPrompt || input + " (Enhanced)";
+    document.getElementById("input").value = enhanced;
   } catch (err) {
-    resultDiv.innerHTML = `Error: ${err.message}`;
+    alert("❌ Failed to enhance prompt.");
+    console.error(err);
   }
 });
