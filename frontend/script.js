@@ -15,7 +15,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   promptText.textContent = "Prompt: " + prompt;
 
   try {
-    const res = await fetch("https://ai-projects-neon.vercel.app/generate", {
+    const res = await fetch("https://ai-projects-mujulgdrd-devoloper-saqibs-projects.vercel.app/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
