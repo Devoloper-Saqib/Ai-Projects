@@ -11,7 +11,10 @@ app.use(express.json());
 app.post("/generate", async (req, res) => {
   const { prompt } = req.body;
 
+  console.log("✅ Received prompt:", prompt);
+
   if (!prompt) {
+    console.log("❌ No prompt provided.");
     return res.status(400).json({ error: "Prompt is required" });
   }
 
@@ -42,17 +45,27 @@ app.post("/generate", async (req, res) => {
 
     const html = response.data.choices[0]?.message?.content || "";
 
+    console.log("✅ AI Response received:");
+    console.log(html);
+
     res.json({ html });
   } catch (err) {
-    console.error("AI error:", err?.response?.data || err.message);
+    console.error("❌ Error from AI API:");
+    if (err.response) {
+      console.error("Status:", err.response.status);
+      console.error("Data:", err.response.data);
+    } else {
+      console.error("Message:", err.message);
+    }
+
     res.status(500).json({ error: "Failed to generate code from AI." });
   }
 });
 
 app.get("/", (req, res) => {
-  res.send("AI HTML Generator API is running.");
+  res.send("⚡ AI HTML Generator API is running.");
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`🚀 Server running on port ${port}`);
 });
