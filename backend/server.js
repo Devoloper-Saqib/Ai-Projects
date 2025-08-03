@@ -1,24 +1,18 @@
-const express = require("express");
-const cors = require("cors");
 const axios = require("axios");
 
-const app = express();
-const port = process.env.PORT || 3000;
+module.exports = async (req, res) => {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Only POST requests are allowed" });
+  }
 
-// ✅ Replace this with your real key, but keep it secret in production!
-const API_KEY = "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".trim();
-
-app.use(cors());
-app.use(express.json());
-
-app.post("/generate", async (req, res) => {
   const { prompt } = req.body;
   console.log("✅ Received prompt:", prompt);
 
   if (!prompt) {
-    console.log("❌ No prompt provided.");
     return res.status(400).json({ error: "Prompt is required" });
   }
+
+  const API_KEY = "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".trim();
 
   try {
     const response = await axios.post(
@@ -28,7 +22,7 @@ app.post("/generate", async (req, res) => {
         messages: [
           {
             role: "system",
-            content: "You're an expert web developer. Generate full HTML code based on the user's prompt. Only return HTML, no explanations or markdown.",
+            content: "You're an expert web developer. Generate full HTML code based on the user's prompt. Only return HTML, no explanations or markdown. Strictly Css and JS must be in <script> & <style> tags.",
           },
           {
             role: "user",
@@ -46,11 +40,10 @@ app.post("/generate", async (req, res) => {
     );
 
     const html = response.data.choices[0]?.message?.content || "";
-
     console.log("✅ AI Response received:");
     console.log(html);
 
-    res.json({ html });
+    res.status(200).json({ html });
   } catch (err) {
     console.error("❌ Error from AI API:");
     if (err.response) {
@@ -62,12 +55,4 @@ app.post("/generate", async (req, res) => {
 
     res.status(500).json({ error: "Failed to generate code from AI." });
   }
-});
-
-app.get("/", (req, res) => {
-  res.send("⚡ AI HTML Generator API is running.");
-});
-
-app.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
-});
+};
