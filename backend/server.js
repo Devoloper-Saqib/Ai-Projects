@@ -6,7 +6,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // ✅ Replace this with your real key, but keep it secret in production!
-const API_KEY = "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".trim();
+const API_KEY = "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".trim();
 
 app.use(cors());
 app.use(express.json());
