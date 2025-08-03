@@ -5,15 +5,14 @@ const axios = require("axios");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ✅ Clean API Key
-const apiKey = "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".trim();
+// ✅ Replace this with your real key, but keep it secret in production!
+const API_KEY = "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".trim();
 
 app.use(cors());
 app.use(express.json());
 
 app.post("/generate", async (req, res) => {
   const { prompt } = req.body;
-
   console.log("✅ Received prompt:", prompt);
 
   if (!prompt) {
@@ -40,10 +39,8 @@ app.post("/generate", async (req, res) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${apiKey}`, // ✅ Clean usage
+          "Authorization": `Bearer ${API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://webbot-ai-website-builder.netlify.app",
-          "X-Title": "Webbot AI Site Builder"
         },
       }
     );
